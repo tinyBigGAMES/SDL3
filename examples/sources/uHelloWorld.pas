@@ -21,13 +21,6 @@
 
      Simple DirectMedia Layer for Pascal (Win64)
 
-Includes the following open-sources libraries:
-* SDL3      - https://github.com/libsdl-org/SDL
-* miniaudio - https://github.com/mackron/miniaudio
-* Nuklear   - https://github.com/Immediate-Mode-UI/Nuklear
-* pl_mpeg   - https://github.com/phoboslab/pl_mpeg
-* stb       - https://github.com/nothings/stb
-
 Copyright © 2022-present tinyBigGAMES™ LLC
 All Rights Reserved.
 

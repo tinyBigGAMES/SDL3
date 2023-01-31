@@ -3,6 +3,9 @@
         <ProjectGuid>{C9341B2E-F393-4A1A-A6BA-9B40B177EABB}</ProjectGuid>
     </PropertyGroup>
     <ItemGroup>
+        <Projects Include="ziparc\ziparc.dproj">
+            <Dependencies/>
+        </Projects>
         <Projects Include="..\examples\projects\Delphi\HelloWorld\HelloWorld.dproj">
             <Dependencies/>
         </Projects>
@@ -14,6 +17,15 @@
             <Default.Personality/>
         </BorlandProject>
     </ProjectExtensions>
+    <Target Name="ziparc">
+        <MSBuild Projects="ziparc\ziparc.dproj"/>
+    </Target>
+    <Target Name="ziparc:Clean">
+        <MSBuild Projects="ziparc\ziparc.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ziparc:Make">
+        <MSBuild Projects="ziparc\ziparc.dproj" Targets="Make"/>
+    </Target>
     <Target Name="HelloWorld">
         <MSBuild Projects="..\examples\projects\Delphi\HelloWorld\HelloWorld.dproj"/>
     </Target>
@@ -24,13 +36,13 @@
         <MSBuild Projects="..\examples\projects\Delphi\HelloWorld\HelloWorld.dproj" Targets="Make"/>
     </Target>
     <Target Name="Build">
-        <CallTarget Targets="HelloWorld"/>
+        <CallTarget Targets="ziparc;HelloWorld"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="HelloWorld:Clean"/>
+        <CallTarget Targets="ziparc:Clean;HelloWorld:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="HelloWorld:Make"/>
+        <CallTarget Targets="ziparc:Make;HelloWorld:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>
