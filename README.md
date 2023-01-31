@@ -4,21 +4,26 @@
 [![Twitter Follow](https://img.shields.io/twitter/follow/tinyBigGAMES?style=social)](https://twitter.com/tinyBigGAMES) <a href="https://mastodon.gamedev.place/@tinyBigGAMES" target="_blank">![Mastodon Follow](https://img.shields.io/mastodon/follow/109289725045534543?domain=https%3A%2F%2Fmastodon.gamedev.place%2F&style=social)</a>
 
 # SDL3
-### Simple DirectMedia Layer for Delphi
+### Simple DirectMedia Layer for Pascal
 
-Pascal bindings that allow you to use **SDL3** and other useful libraries with <a href="https://www.embarcadero.com/es/products/delphi" target="_blank">Delphi</a>. 
+Pascal bindings that allow you to use **SDL3** and other useful libraries with <a href="https://www.embarcadero.com/es/products/delphi" target="_blank">Delphi</a> and <a href="https://www.freepascal.org" target="_blank">FreePascal</a>. 
 
 ### Included
-- **SDL3** (https://github.com/libsdl-org/SDL)
-- **miniaudio** (https://github.com/mackron/miniaudio)
-- **pl_mpeg** (https://github.com/phoboslab/pl_mpeg)
-- **Nuklear** (https://github.com/Immediate-Mode-UI/Nuklear)
-- **stb** (https://github.com/nothings/stb)
+* **SDL3** (https://github.com/libsdl-org/SDL)
+* **miniaudio** (https://github.com/mackron/miniaudio)
+* **Nuklear** (https://github.com/Immediate-Mode-UI/Nuklear)
+* **physfs** (https://github.com/icculus/physfs)
+* **pl_mpeg** (https://github.com/phoboslab/pl_mpeg)
+* **stb** (https://github.com/nothings/stb)
+* **tmx** (https://github.com/baylej/tmx)
+* **zlib** (https://github.com/madler/zlib)
 
 
 ### Minimum Requirements 
-- Windows 10+ (64 bits)
-- Delphi/FreePascal that can target Win64/Unicode
+- Should work on Windows 7+ (64 bits)
+- Should work on any Delphi/FreePascal that can target Win64/Unicode
+
+**NOTE: Made/tested on latest Windows/Delphi/FreePascal.**
 
 ### Usage
 You simply add `SDL3` to your uses section and everything will be linked in your executable **(~2MB overhead)**, ready for use with no DLLs to maintain. You will have direct access to all the aforementioned libraries. :cool:  
