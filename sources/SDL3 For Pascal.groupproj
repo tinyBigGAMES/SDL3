@@ -3,7 +3,7 @@
         <ProjectGuid>{C9341B2E-F393-4A1A-A6BA-9B40B177EABB}</ProjectGuid>
     </PropertyGroup>
     <ItemGroup>
-        <Projects Include="..\examples\projects\HelloWorld\HelloWorld.dproj">
+        <Projects Include="..\examples\projects\Delphi\HelloWorld\HelloWorld.dproj">
             <Dependencies/>
         </Projects>
     </ItemGroup>
@@ -15,13 +15,13 @@
         </BorlandProject>
     </ProjectExtensions>
     <Target Name="HelloWorld">
-        <MSBuild Projects="..\examples\projects\HelloWorld\HelloWorld.dproj"/>
+        <MSBuild Projects="..\examples\projects\Delphi\HelloWorld\HelloWorld.dproj"/>
     </Target>
     <Target Name="HelloWorld:Clean">
-        <MSBuild Projects="..\examples\projects\HelloWorld\HelloWorld.dproj" Targets="Clean"/>
+        <MSBuild Projects="..\examples\projects\Delphi\HelloWorld\HelloWorld.dproj" Targets="Clean"/>
     </Target>
     <Target Name="HelloWorld:Make">
-        <MSBuild Projects="..\examples\projects\HelloWorld\HelloWorld.dproj" Targets="Make"/>
+        <MSBuild Projects="..\examples\projects\Delphi\HelloWorld\HelloWorld.dproj" Targets="Make"/>
     </Target>
     <Target Name="Build">
         <CallTarget Targets="HelloWorld"/>

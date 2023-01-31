@@ -1,4 +1,4 @@
-﻿(****************************************************************************
+(****************************************************************************
                                                                       
     .:-======-:.  :---------::.       .----:                .         
   -+************= +*************=:    -****+                 .:.      
@@ -25,8 +25,11 @@ Includes the following open-sources libraries:
 * SDL3      - https://github.com/libsdl-org/SDL
 * miniaudio - https://github.com/mackron/miniaudio
 * Nuklear   - https://github.com/Immediate-Mode-UI/Nuklear
+* physfs    - https://github.com/icculus/physfs
 * pl_mpeg   - https://github.com/phoboslab/pl_mpeg
 * stb       - https://github.com/nothings/stb 
+* tmx       - https://github.com/baylej/tmx
+* zlib      - https://github.com/madler/zlib
 
 Copyright © 2022-present tinyBigGAMES™ LLC
 All Rights Reserved.
@@ -448,6 +451,14 @@ const
   MA_NODE_BUS_COUNT_UNKNOWN = 255;
   MA_ENGINE_MAX_LISTENERS = 4;
   MA_SOUND_SOURCE_CHANNEL_COUNT = $FFFFFFFF;
+  Z_DEFLATED = 8;
+  Z_DEFAULT_STRATEGY = 0;
+  APPEND_STATUS_CREATE = 0;
+  Z_OK = 0;
+  TMX_FLIPPED_HORIZONTALLY = $80000000;
+  TMX_FLIPPED_VERTICALLY = $40000000;
+  TMX_FLIPPED_DIAGONALLY = $20000000;
+  TMX_FLIP_BITS_REMOVAL = $1FFFFFFF;
 
 type
   // Forward declarations
@@ -458,6 +469,7 @@ type
   PPInteger = ^PInteger;
   PPSingle = ^PSingle;
   PPDouble = ^PDouble;
+  PUInt32 = ^UInt32;
   PNativeUInt = ^NativeUInt;
   PSDL_iconv_data_t = Pointer;
   PPSDL_iconv_data_t = ^PSDL_iconv_data_t;
@@ -801,6 +813,23 @@ type
   Pma_sound_inlined = ^ma_sound_inlined;
   Pma_engine_config = ^ma_engine_config;
   Pma_engine = ^ma_engine;
+  Ptm_zip_s = ^tm_zip_s;
+  Pzip_fileinfo = ^zip_fileinfo;
+  P_tmx_prop = ^_tmx_prop;
+  P_tmx_img = ^_tmx_img;
+  P_tmx_frame = ^_tmx_frame;
+  P_tmx_tile = ^_tmx_tile;
+  P_tmx_ts = ^_tmx_ts;
+  P_tmx_ts_list = ^_tmx_ts_list;
+  P_tmx_shape = ^_tmx_shape;
+  P_tmx_text = ^_tmx_text;
+  P_tmx_obj = ^_tmx_obj;
+  P_tmx_objgr = ^_tmx_objgr;
+  P_tmx_templ = ^_tmx_templ;
+  P_tmx_layer = ^_tmx_layer;
+  P_tmx_map = ^_tmx_map;
+  Ptmx_col_bytes = ^tmx_col_bytes;
+  Ptmx_col_floats = ^tmx_col_floats;
 
   SDL_bool = (
     SDL_FALSE = 0,
@@ -7220,6 +7249,361 @@ type
     monoExpansionMode: ma_mono_expansion_mode;
   end;
 
+  tm_zip_s = record
+    tm_sec: Integer;
+    tm_min: Integer;
+    tm_hour: Integer;
+    tm_mday: Integer;
+    tm_mon: Integer;
+    tm_year: Integer;
+  end;
+
+  tm_zip = tm_zip_s;
+
+  zip_fileinfo = record
+    tmz_date: tm_zip;
+    dosDate: Cardinal;
+    internal_fa: Cardinal;
+  end;
+
+  zipFile = Pointer;
+
+  tmx_map_orient = (
+    O_NONE = 0,
+    O_ORT = 1,
+    O_ISO = 2,
+    O_STA = 3,
+    O_HEX = 4);
+  Ptmx_map_orient = ^tmx_map_orient;
+
+  tmx_map_renderorder = (
+    R_NONE = 0,
+    R_RIGHTDOWN = 1,
+    R_RIGHTUP = 2,
+    R_LEFTDOWN = 3,
+    R_LEFTUP = 4);
+  Ptmx_map_renderorder = ^tmx_map_renderorder;
+
+  tmx_stagger_index = (
+    SI_NONE = 0,
+    SI_EVEN = 1,
+    SI_ODD = 2);
+  Ptmx_stagger_index = ^tmx_stagger_index;
+
+  tmx_stagger_axis = (
+    SA_NONE = 0,
+    SA_X = 1,
+    SA_Y = 2);
+  Ptmx_stagger_axis = ^tmx_stagger_axis;
+
+  tmx_obj_alignment = (
+    OA_NONE = 0,
+    OA_TOP = 1,
+    OA_LEFT = 2,
+    OA_BOTTOM = 3,
+    OA_RIGHT = 4,
+    OA_CENTER = 5,
+    OA_TOPLEFT = 6,
+    OA_TOPRIGHT = 7,
+    OA_BOTTOMLEFT = 8,
+    OA_BOTTOMRIGHT = 9);
+  Ptmx_obj_alignment = ^tmx_obj_alignment;
+
+  tmx_layer_type = (
+    L_NONE = 0,
+    L_LAYER = 1,
+    L_OBJGR = 2,
+    L_IMAGE = 3,
+    L_GROUP = 4);
+  Ptmx_layer_type = ^tmx_layer_type;
+
+  tmx_objgr_draworder = (
+    G_NONE = 0,
+    G_INDEX = 1,
+    G_TOPDOWN = 2);
+  Ptmx_objgr_draworder = ^tmx_objgr_draworder;
+
+  tmx_obj_type = (
+    OT_NONE = 0,
+    OT_SQUARE = 1,
+    OT_POLYGON = 2,
+    OT_POLYLINE = 3,
+    OT_ELLIPSE = 4,
+    OT_TILE = 5,
+    OT_TEXT = 6,
+    OT_POINT = 7);
+  Ptmx_obj_type = ^tmx_obj_type;
+
+  tmx_property_type = (
+    PT_NONE = 0,
+    PT_INT = 1,
+    PT_FLOAT = 2,
+    PT_BOOL = 3,
+    PT_STRING = 4,
+    PT_COLOR = 5,
+    PT_FILE = 6);
+  Ptmx_property_type = ^tmx_property_type;
+
+  tmx_horizontal_align = (
+    HA_NONE = 0,
+    HA_LEFT = 1,
+    HA_CENTER = 2,
+    HA_RIGHT = 3);
+  Ptmx_horizontal_align = ^tmx_horizontal_align;
+
+  tmx_vertical_align = (
+    VA_NONE = 0,
+    VA_TOP = 1,
+    VA_CENTER = 2,
+    VA_BOTTOM = 3);
+  Ptmx_vertical_align = ^tmx_vertical_align;
+  Ptmx_property = ^tmx_property;
+  Ptmx_image = ^tmx_image;
+  Ptmx_anim_frame = ^tmx_anim_frame;
+  Ptmx_tile = ^tmx_tile;
+  PPtmx_tile = ^Ptmx_tile;
+  Ptmx_tileset = ^tmx_tileset;
+  Ptmx_tileset_list = ^tmx_tileset_list;
+  Ptmx_shape = ^tmx_shape;
+  Ptmx_text = ^tmx_text;
+  Ptmx_object = ^tmx_object;
+  Ptmx_object_group = ^tmx_object_group;
+  Ptmx_template = ^tmx_template;
+  Ptmx_layer = ^tmx_layer;
+  Ptmx_map = ^tmx_map;
+  Ptmx_properties = Pointer;
+  PPtmx_properties = ^Ptmx_properties;
+
+  tmx_user_data = record
+    case Integer of
+      0: (integer_: Integer);
+      1: (decimal: Single);
+      2: (pointer: Pointer);
+  end;
+
+  tmx_property_value = record
+    case Integer of
+      0: (integer_: Integer);
+      1: (boolean: Integer);
+      2: (decimal: Single);
+      3: (string_: PUTF8Char);
+      4: (file_: PUTF8Char);
+      5: (color: UInt32);
+  end;
+
+  _tmx_prop = record
+    name: PUTF8Char;
+    type_: tmx_property_type;
+    value: tmx_property_value;
+  end;
+
+  _tmx_img = record
+    source: PUTF8Char;
+    trans: Cardinal;
+    uses_trans: Integer;
+    width: Cardinal;
+    height: Cardinal;
+    resource_image: Pointer;
+  end;
+
+  _tmx_frame = record
+    tile_id: Cardinal;
+    duration: Cardinal;
+  end;
+
+  _tmx_tile = record
+    id: Cardinal;
+    tileset: Ptmx_tileset;
+    ul_x: Cardinal;
+    ul_y: Cardinal;
+    image: Ptmx_image;
+    collision: Ptmx_object;
+    animation_len: Cardinal;
+    animation: Ptmx_anim_frame;
+    type_: PUTF8Char;
+    properties: Ptmx_properties;
+    user_data: tmx_user_data;
+  end;
+
+  _tmx_ts = record
+    name: PUTF8Char;
+    tile_width: Cardinal;
+    tile_height: Cardinal;
+    spacing: Cardinal;
+    margin: Cardinal;
+    x_offset: Integer;
+    y_offset: Integer;
+    objectalignment: tmx_obj_alignment;
+    tilecount: Cardinal;
+    image: Ptmx_image;
+    user_data: tmx_user_data;
+    properties: Ptmx_properties;
+    tiles: Ptmx_tile;
+  end;
+
+  _tmx_ts_list = record
+    is_embedded: Integer;
+    firstgid: Cardinal;
+    source: PUTF8Char;
+    tileset: Ptmx_tileset;
+    next: Ptmx_tileset_list;
+  end;
+
+  _tmx_shape = record
+    points: PPDouble;
+    points_len: Integer;
+  end;
+
+  _tmx_text = record
+    fontfamily: PUTF8Char;
+    pixelsize: Integer;
+    color: UInt32;
+    wrap: Integer;
+    bold: Integer;
+    italic: Integer;
+    underline: Integer;
+    strikeout: Integer;
+    kerning: Integer;
+    halign: tmx_horizontal_align;
+    valign: tmx_vertical_align;
+    text: PUTF8Char;
+  end;
+
+  P_anonymous_type_95 = ^_anonymous_type_95;
+  _anonymous_type_95 = record
+    case Integer of
+      0: (gid: Integer);
+      1: (shape: Ptmx_shape);
+      2: (text: Ptmx_text);
+  end;
+
+  _tmx_obj = record
+    id: Cardinal;
+    obj_type: tmx_obj_type;
+    x: Double;
+    y: Double;
+    width: Double;
+    height: Double;
+    content: _anonymous_type_95;
+    visible: Integer;
+    rotation: Double;
+    name: PUTF8Char;
+    type_: PUTF8Char;
+    template_ref: Ptmx_template;
+    properties: Ptmx_properties;
+    next: Ptmx_object;
+  end;
+
+  _tmx_objgr = record
+    color: UInt32;
+    draworder: tmx_objgr_draworder;
+    head: Ptmx_object;
+  end;
+
+  _tmx_templ = record
+    is_embedded: Integer;
+    tileset_ref: Ptmx_tileset_list;
+    object_: Ptmx_object;
+  end;
+
+  layer_content = record
+    case Integer of
+      0: (gids: PUInt32);
+      1: (objgr: Ptmx_object_group);
+      2: (image: Ptmx_image);
+      3: (group_head: Ptmx_layer);
+  end;
+
+  _tmx_layer = record
+    id: Integer;
+    name: PUTF8Char;
+    opacity: Double;
+    visible: Integer;
+    offsetx: Integer;
+    offsety: Integer;
+    parallaxx: Double;
+    parallaxy: Double;
+    tintcolor: UInt32;
+    type_: tmx_layer_type;
+    content: layer_content;
+    user_data: tmx_user_data;
+    properties: Ptmx_properties;
+    next: Ptmx_layer;
+  end;
+
+  _tmx_map = record
+    orient: tmx_map_orient;
+    width: Cardinal;
+    height: Cardinal;
+    tile_width: Cardinal;
+    tile_height: Cardinal;
+    stagger_index: tmx_stagger_index;
+    stagger_axis: tmx_stagger_axis;
+    hexsidelength: Integer;
+    backgroundcolor: UInt32;
+    renderorder: tmx_map_renderorder;
+    properties: Ptmx_properties;
+    ts_head: Ptmx_tileset_list;
+    ly_head: Ptmx_layer;
+    tilecount: Cardinal;
+    tiles: PPtmx_tile;
+    user_data: tmx_user_data;
+  end;
+
+  tmx_property = _tmx_prop;
+  tmx_image = _tmx_img;
+  tmx_anim_frame = _tmx_frame;
+  tmx_tile = _tmx_tile;
+  tmx_tileset = _tmx_ts;
+  tmx_tileset_list = _tmx_ts_list;
+  tmx_shape = _tmx_shape;
+  tmx_object_group = _tmx_objgr;
+  tmx_template = _tmx_templ;
+  tmx_layer = _tmx_layer;
+  tmx_map = _tmx_map;
+  tmx_text = _tmx_text;
+  tmx_object = _tmx_obj;
+
+  tmx_read_functor = function(userdata: Pointer; buffer: PUTF8Char; len: Integer): Integer; cdecl;
+
+  tmx_property_functor = procedure(property_: Ptmx_property; userdata: Pointer); cdecl;
+
+  tmx_col_bytes = record
+    r: UInt8;
+    g: UInt8;
+    b: UInt8;
+    a: UInt8;
+  end;
+
+  tmx_col_floats = record
+    r: Single;
+    g: Single;
+    b: Single;
+    a: Single;
+  end;
+
+  Ptmx_resource_manager = Pointer;
+  PPtmx_resource_manager = ^Ptmx_resource_manager;
+
+  _tmx_error_codes = (
+    E_NONE = 0,
+    E_UNKN = 1,
+    E_INVAL = 2,
+    E_ALLOC = 8,
+    E_ACCESS = 10,
+    E_NOENT = 11,
+    E_FORMAT = 12,
+    E_ENCCMP = 13,
+    E_FONCT = 16,
+    E_BDATA = 20,
+    E_ZDATA = 21,
+    E_XDATA = 22,
+    E_ZSDATA = 23,
+    E_CDATA = 24,
+    E_MISSEL = 30);
+  P_tmx_error_codes = ^_tmx_error_codes;
+  tmx_error_codes = _tmx_error_codes;
+
   SDL_TLSSet_destructor = procedure(p1: Pointer); cdecl;
   SDL_qsort_compare = function(const p1: Pointer; const p2: Pointer): Integer; cdecl;
   SDL_bsearch_compare = function(const p1: Pointer; const p2: Pointer): Integer; cdecl;
@@ -9661,6 +10045,49 @@ var
   ma_sound_group_set_stop_time_in_milliseconds: procedure(pGroup: Pma_sound_group; absoluteGlobalTimeInMilliseconds: ma_uint64); cdecl;
   ma_sound_group_is_playing: function(const pGroup: Pma_sound_group): ma_bool32; cdecl;
   ma_sound_group_get_time_in_pcm_frames: function(const pGroup: Pma_sound_group): ma_uint64; cdecl;
+  PHYSFS_init: function(const argv0: PUTF8Char): Integer; cdecl;
+  PHYSFS_deinit: function(): Integer; cdecl;
+  PHYSFS_getWriteDir: function(): PUTF8Char; cdecl;
+  PHYSFS_setWriteDir: function(const newDir: PUTF8Char): Integer; cdecl;
+  PHYSFS_mount: function(const newDir: PUTF8Char; const mountPoint: PUTF8Char; appendToPath: Integer): Integer; cdecl;
+  PHYSFS_unmount: function(const oldDir: PUTF8Char): Integer; cdecl;
+  PHYSFSRWOPS_openRead: function(const fname: PUTF8Char): PSDL_RWops; cdecl;
+  PHYSFSRWOPS_openWrite: function(const fname: PUTF8Char): PSDL_RWops; cdecl;
+  PHYSFSRWOPS_openAppend: function(const fname: PUTF8Char): PSDL_RWops; cdecl;
+  crc32: function(crc: Cardinal; const buf: PByte; len: Cardinal): Cardinal; cdecl;
+  zipOpen: function(const pathname: PUTF8Char; append: Integer): zipFile; cdecl;
+  zipOpenNewFileInZip3: function(file_: zipFile; const filename: PUTF8Char; const zipfi: Pzip_fileinfo; const extrafield_local: Pointer; intsize_extrafield_local: Cardinal; const extrafield_global: Pointer; intsize_extrafield_global: Cardinal; const comment: PUTF8Char; method: Integer; level: Integer; raw: Integer; windowBits: Integer; memLevel: Integer; strategy: Integer; const password: PUTF8Char; crcForCrypting: Cardinal): Integer; cdecl;
+  zipWriteInFileInZip: function(file_: zipFile; const buf: Pointer; len: Cardinal): Integer; cdecl;
+  zipCloseFileInZip: function(file_: zipFile): Integer; cdecl;
+  zipClose: function(file_: zipFile; const global_comment: PUTF8Char): Integer; cdecl;
+  tmx_load: function(const path: PUTF8Char): Ptmx_map; cdecl;
+  tmx_load_buffer: function(const buffer: PUTF8Char; len: Integer): Ptmx_map; cdecl;
+  tmx_load_fd: function(fd: Integer): Ptmx_map; cdecl;
+  tmx_load_callback: function(callback: tmx_read_functor; userdata: Pointer): Ptmx_map; cdecl;
+  tmx_map_free: procedure(map: Ptmx_map); cdecl;
+  tmx_get_tile: function(map: Ptmx_map; gid: Cardinal): Ptmx_tile; cdecl;
+  tmx_find_layer_by_id: function(const map: Ptmx_map; id: Integer): Ptmx_layer; cdecl;
+  tmx_find_layer_by_name: function(const map: Ptmx_map; const name: PUTF8Char): Ptmx_layer; cdecl;
+  tmx_get_property: function(hash: Ptmx_properties; const key: PUTF8Char): Ptmx_property; cdecl;
+  tmx_property_foreach: procedure(hash: Ptmx_properties; callback: tmx_property_functor; userdata: Pointer); cdecl;
+  tmx_col_to_bytes: function(color: UInt32): tmx_col_bytes; cdecl;
+  tmx_col_to_floats: function(color: UInt32): tmx_col_floats; cdecl;
+  tmx_make_resource_manager: function(): Ptmx_resource_manager; cdecl;
+  tmx_free_resource_manager: procedure(rc_mgr: Ptmx_resource_manager); cdecl;
+  tmx_load_tileset: function(rc_mgr: Ptmx_resource_manager; const path: PUTF8Char): Integer; cdecl;
+  tmx_load_tileset_buffer: function(rc_mgr: Ptmx_resource_manager; const buffer: PUTF8Char; len: Integer; const key: PUTF8Char): Integer; cdecl;
+  tmx_load_tileset_fd: function(rc_mgr: Ptmx_resource_manager; fd: Integer; const key: PUTF8Char): Integer; cdecl;
+  tmx_load_tileset_callback: function(rc_mgr: Ptmx_resource_manager; callback: tmx_read_functor; userdata: Pointer; const key: PUTF8Char): Integer; cdecl;
+  tmx_load_template: function(rc_mgr: Ptmx_resource_manager; const path: PUTF8Char): Integer; cdecl;
+  tmx_load_template_buffer: function(rc_mgr: Ptmx_resource_manager; const buffer: PUTF8Char; len: Integer; const key: PUTF8Char): Integer; cdecl;
+  tmx_load_template_fd: function(rc_mgr: Ptmx_resource_manager; fd: Integer; const key: PUTF8Char): Integer; cdecl;
+  tmx_load_template_callback: function(rc_mgr: Ptmx_resource_manager; callback: tmx_read_functor; userdata: Pointer; const key: PUTF8Char): Integer; cdecl;
+  tmx_rcmgr_load: function(rc_mgr: Ptmx_resource_manager; const path: PUTF8Char): Ptmx_map; cdecl;
+  tmx_rcmgr_load_buffer: function(rc_mgr: Ptmx_resource_manager; const buffer: PUTF8Char; len: Integer): Ptmx_map; cdecl;
+  tmx_rcmgr_load_fd: function(rc_mgr: Ptmx_resource_manager; fd: Integer): Ptmx_map; cdecl;
+  tmx_rcmgr_load_callback: function(rc_mgr: Ptmx_resource_manager; callback: tmx_read_functor; userdata: Pointer): Ptmx_map; cdecl;
+  tmx_perror: procedure(const p1: PUTF8Char); cdecl;
+  tmx_strerr: function(): PUTF8Char; cdecl;
 
 implementation
 
@@ -9939,6 +10366,7 @@ procedure GetExports(const aDLLHandle: Pointer);
 begin
 {$REGION 'Exports'}
   if not Assigned(aDllHandle) then Exit;
+  crc32 := MemoryGetProcAddress(aDLLHandle, 'crc32');
   ma_aligned_free := MemoryGetProcAddress(aDLLHandle, 'ma_aligned_free');
   ma_aligned_malloc := MemoryGetProcAddress(aDLLHandle, 'ma_aligned_malloc');
   ma_apply_volume_factor_f32 := MemoryGetProcAddress(aDLLHandle, 'ma_apply_volume_factor_f32');
@@ -11358,6 +11786,15 @@ begin
   nk_window_set_size := MemoryGetProcAddress(aDLLHandle, 'nk_window_set_size');
   nk_window_show := MemoryGetProcAddress(aDLLHandle, 'nk_window_show');
   nk_window_show_if := MemoryGetProcAddress(aDLLHandle, 'nk_window_show_if');
+  PHYSFS_deinit := MemoryGetProcAddress(aDLLHandle, 'PHYSFS_deinit');
+  PHYSFS_getWriteDir := MemoryGetProcAddress(aDLLHandle, 'PHYSFS_getWriteDir');
+  PHYSFS_init := MemoryGetProcAddress(aDLLHandle, 'PHYSFS_init');
+  PHYSFS_mount := MemoryGetProcAddress(aDLLHandle, 'PHYSFS_mount');
+  PHYSFS_setWriteDir := MemoryGetProcAddress(aDLLHandle, 'PHYSFS_setWriteDir');
+  PHYSFS_unmount := MemoryGetProcAddress(aDLLHandle, 'PHYSFS_unmount');
+  PHYSFSRWOPS_openAppend := MemoryGetProcAddress(aDLLHandle, 'PHYSFSRWOPS_openAppend');
+  PHYSFSRWOPS_openRead := MemoryGetProcAddress(aDLLHandle, 'PHYSFSRWOPS_openRead');
+  PHYSFSRWOPS_openWrite := MemoryGetProcAddress(aDLLHandle, 'PHYSFSRWOPS_openWrite');
   plm_audio_create_with_buffer := MemoryGetProcAddress(aDLLHandle, 'plm_audio_create_with_buffer');
   plm_audio_decode := MemoryGetProcAddress(aDLLHandle, 'plm_audio_decode');
   plm_audio_destroy := MemoryGetProcAddress(aDLLHandle, 'plm_audio_destroy');
@@ -12361,6 +12798,39 @@ begin
   stbtt_Rasterize := MemoryGetProcAddress(aDLLHandle, 'stbtt_Rasterize');
   stbtt_ScaleForMappingEmToPixels := MemoryGetProcAddress(aDLLHandle, 'stbtt_ScaleForMappingEmToPixels');
   stbtt_ScaleForPixelHeight := MemoryGetProcAddress(aDLLHandle, 'stbtt_ScaleForPixelHeight');
+  tmx_col_to_bytes := MemoryGetProcAddress(aDLLHandle, 'tmx_col_to_bytes');
+  tmx_col_to_floats := MemoryGetProcAddress(aDLLHandle, 'tmx_col_to_floats');
+  tmx_find_layer_by_id := MemoryGetProcAddress(aDLLHandle, 'tmx_find_layer_by_id');
+  tmx_find_layer_by_name := MemoryGetProcAddress(aDLLHandle, 'tmx_find_layer_by_name');
+  tmx_free_resource_manager := MemoryGetProcAddress(aDLLHandle, 'tmx_free_resource_manager');
+  tmx_get_property := MemoryGetProcAddress(aDLLHandle, 'tmx_get_property');
+  tmx_get_tile := MemoryGetProcAddress(aDLLHandle, 'tmx_get_tile');
+  tmx_load := MemoryGetProcAddress(aDLLHandle, 'tmx_load');
+  tmx_load_buffer := MemoryGetProcAddress(aDLLHandle, 'tmx_load_buffer');
+  tmx_load_callback := MemoryGetProcAddress(aDLLHandle, 'tmx_load_callback');
+  tmx_load_fd := MemoryGetProcAddress(aDLLHandle, 'tmx_load_fd');
+  tmx_load_template := MemoryGetProcAddress(aDLLHandle, 'tmx_load_template');
+  tmx_load_template_buffer := MemoryGetProcAddress(aDLLHandle, 'tmx_load_template_buffer');
+  tmx_load_template_callback := MemoryGetProcAddress(aDLLHandle, 'tmx_load_template_callback');
+  tmx_load_template_fd := MemoryGetProcAddress(aDLLHandle, 'tmx_load_template_fd');
+  tmx_load_tileset := MemoryGetProcAddress(aDLLHandle, 'tmx_load_tileset');
+  tmx_load_tileset_buffer := MemoryGetProcAddress(aDLLHandle, 'tmx_load_tileset_buffer');
+  tmx_load_tileset_callback := MemoryGetProcAddress(aDLLHandle, 'tmx_load_tileset_callback');
+  tmx_load_tileset_fd := MemoryGetProcAddress(aDLLHandle, 'tmx_load_tileset_fd');
+  tmx_make_resource_manager := MemoryGetProcAddress(aDLLHandle, 'tmx_make_resource_manager');
+  tmx_map_free := MemoryGetProcAddress(aDLLHandle, 'tmx_map_free');
+  tmx_perror := MemoryGetProcAddress(aDLLHandle, 'tmx_perror');
+  tmx_property_foreach := MemoryGetProcAddress(aDLLHandle, 'tmx_property_foreach');
+  tmx_rcmgr_load := MemoryGetProcAddress(aDLLHandle, 'tmx_rcmgr_load');
+  tmx_rcmgr_load_buffer := MemoryGetProcAddress(aDLLHandle, 'tmx_rcmgr_load_buffer');
+  tmx_rcmgr_load_callback := MemoryGetProcAddress(aDLLHandle, 'tmx_rcmgr_load_callback');
+  tmx_rcmgr_load_fd := MemoryGetProcAddress(aDLLHandle, 'tmx_rcmgr_load_fd');
+  tmx_strerr := MemoryGetProcAddress(aDLLHandle, 'tmx_strerr');
+  zipClose := MemoryGetProcAddress(aDLLHandle, 'zipClose');
+  zipCloseFileInZip := MemoryGetProcAddress(aDLLHandle, 'zipCloseFileInZip');
+  zipOpen := MemoryGetProcAddress(aDLLHandle, 'zipOpen');
+  zipOpenNewFileInZip3 := MemoryGetProcAddress(aDLLHandle, 'zipOpenNewFileInZip3');
+  zipWriteInFileInZip := MemoryGetProcAddress(aDLLHandle, 'zipWriteInFileInZip');
 {$ENDREGION}
 end;
 
