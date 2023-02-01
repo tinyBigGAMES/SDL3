@@ -7604,6 +7604,15 @@ type
   P_tmx_error_codes = ^_tmx_error_codes;
   tmx_error_codes = _tmx_error_codes;
 
+  Ttmx_img_load_func = function(const path: PUTF8Char): Pointer; cdecl;
+  Ttmx_img_free_func = procedure(address: Pointer); cdecl;
+  Ttmx_alloc_func    = function(address: Pointer; len: NativeUInt): Pointer; cdecl;
+  Ttmx_free_func     = procedure(address: Pointer); cdecl;
+  Ptmx_img_load_func = ^Ttmx_img_load_func;
+  Ptmx_img_free_func = ^Ttmx_img_free_func;
+  Ptmx_alloc_func    = ^Ttmx_alloc_func;
+  Ptmx_free_func     = ^Ttmx_free_func;
+
   SDL_TLSSet_destructor = procedure(p1: Pointer); cdecl;
   SDL_qsort_compare = function(const p1: Pointer; const p2: Pointer): Integer; cdecl;
   SDL_bsearch_compare = function(const p1: Pointer; const p2: Pointer): Integer; cdecl;
@@ -10088,6 +10097,10 @@ var
   tmx_rcmgr_load_callback: function(rc_mgr: Ptmx_resource_manager; callback: tmx_read_functor; userdata: Pointer): Ptmx_map; cdecl;
   tmx_perror: procedure(const p1: PUTF8Char); cdecl;
   tmx_strerr: function(): PUTF8Char; cdecl;
+  tmx_free_func: Ptmx_free_func;
+  tmx_alloc_func: Ptmx_alloc_func;
+  tmx_img_free_func: Ptmx_img_free_func;
+  tmx_img_load_func: Ptmx_img_load_func;
 
 implementation
 
@@ -12826,6 +12839,10 @@ begin
   tmx_rcmgr_load_callback := MemoryGetProcAddress(aDLLHandle, 'tmx_rcmgr_load_callback');
   tmx_rcmgr_load_fd := MemoryGetProcAddress(aDLLHandle, 'tmx_rcmgr_load_fd');
   tmx_strerr := MemoryGetProcAddress(aDLLHandle, 'tmx_strerr');
+  tmx_img_load_func := MemoryGetProcAddress(aDLLHandle, 'tmx_img_load_func');
+  tmx_img_free_func := MemoryGetProcAddress(aDLLHandle, 'tmx_img_free_func');
+  tmx_alloc_func := MemoryGetProcAddress(aDLLHandle, 'tmx_alloc_func');
+  tmx_free_func := MemoryGetProcAddress(aDLLHandle, 'tmx_free_func');
   zipClose := MemoryGetProcAddress(aDLLHandle, 'zipClose');
   zipCloseFileInZip := MemoryGetProcAddress(aDLLHandle, 'zipCloseFileInZip');
   zipOpen := MemoryGetProcAddress(aDLLHandle, 'zipOpen');

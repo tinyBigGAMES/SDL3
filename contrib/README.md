@@ -4,7 +4,7 @@ provided by users of **SDL3 for Pascal (SDL3Pas)** and were not tested *(unless 
 
 If you wish to have your **SDL3** contribution added, submit a **PR** with
 - A new `folder` of your contribution
-- Update this **README.md** with an entry below including the **title [delphi | fPC]**, **author/contact**, **description** and optional **URL** for further information about it.
+- Update this **README.md** with an entry below including the **title [delphi | fpc]**, **author/contact**, **description** and optional **URL** for further information about it.
 
 ## ziparc [delphi]
 By Jarrod Davis (mailto:jarrod.davis@tinybiggames.com)  
