@@ -1,4 +1,4 @@
-﻿(****************************************************************************
+(****************************************************************************
                                                                       
     .:-======-:.  :---------::.       .----:                .         
   -+************= +*************=:    -****+                 .:.      
@@ -24,6 +24,7 @@
 Includes the following open-sources libraries:
 * SDL3      - https://github.com/libsdl-org/SDL
 * miniaudio - https://github.com/mackron/miniaudio
+* nbnet     - https://github.com/nathhB/nbnet
 * Nuklear   - https://github.com/Immediate-Mode-UI/Nuklear
 * Parson    - https://github.com/kgabis/parson
 * physfs    - https://github.com/icculus/physfs
@@ -7667,8 +7668,6 @@ type
   NBN_MessageBuilder = function(): Pointer; cdecl;
 
   NBN_MessageDestructor = procedure(p1: Pointer); cdecl;
-  PNBN_Endpoint = Pointer;
-  PPNBN_Endpoint = ^PNBN_Endpoint;
 
   NBN_RPC_ParamType = (
     NBN_RPC_PARAM_INT = 0,
