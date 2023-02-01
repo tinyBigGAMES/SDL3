@@ -37,7 +37,7 @@ Copyright © 2022-present tinyBigGAMES™ LLC
 All Rights Reserved.
 
 Website: https://tinybiggames.com
-Email  : support@tinybiggames.com
+Email  : mailto:support@tinybiggames.com
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:

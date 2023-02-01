@@ -9,14 +9,16 @@
 Pascal bindings that allow you to use **SDL3** and other useful libraries with <a href="https://www.embarcadero.com/es/products/delphi" target="_blank">Delphi</a> and <a href="https://www.freepascal.org" target="_blank">FreePascal</a>. 
 
 ### Included
-* **SDL3** (https://github.com/libsdl-org/SDL)
-* **miniaudio** (https://github.com/mackron/miniaudio)
-* **Nuklear** (https://github.com/Immediate-Mode-UI/Nuklear)
-* **physfs** (https://github.com/icculus/physfs)
-* **pl_mpeg** (https://github.com/phoboslab/pl_mpeg)
-* **stb** (https://github.com/nothings/stb)
-* **tmx** (https://github.com/baylej/tmx)
-* **zlib** (https://github.com/madler/zlib)
+- **SDL3** (https://github.com/libsdl-org/SDL)
+- **miniaudio** (https://github.com/mackron/miniaudio)
+- **nbnet** (https://github.com/nathhB/nbnet)
+- **Nuklear** (https://github.com/Immediate-Mode-UI/Nuklear)
+- **Parson** (https://github.com/kgabis/parson)
+- **physfs** (https://github.com/icculus/physfs)
+- **pl_mpeg** (https://github.com/phoboslab/pl_mpeg)
+- **stb** (https://github.com/nothings/stb)
+- **tmx** (https://github.com/baylej/tmx)
+- **zlib** (https://github.com/madler/zlib)
 
 
 ### Minimum Requirements 

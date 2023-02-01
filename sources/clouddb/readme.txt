@@ -23,7 +23,7 @@ Copyright © 2022-present tinyBigGAMES™ LLC
 All Rights Reserved.
 
 Website: https://tinybiggames.com
-Email  : support@tinybiggames.com
+Email  : mailto:support@tinybiggames.com
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -67,5 +67,5 @@ POSSIBILITY OF SUCH DAMAGE.
 CloudDB - PHP interface to remote MySQL database.
 
 1) modify $xxx variables in config.php to configure mysql setting
-2) place config.php in a location outside the vsible http path
+2) place config.php in a location outside the visible http path
 3) modify $config_path variable in index.php to point to your config.php script. 
