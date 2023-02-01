@@ -67,7 +67,9 @@ Includes the following open-sources libraries:
 -----------------------------------------------------------------------------
 * SDL3      - https://github.com/libsdl-org/SDL
 * miniaudio - https://github.com/mackron/miniaudio
+* nbnet     - https://github.com/nathhB/nbnet
 * Nuklear   - https://github.com/Immediate-Mode-UI/Nuklear
+* Parson    - https://github.com/kgabis/parson
 * physfs    - https://github.com/icculus/physfs
 * pl_mpeg   - https://github.com/phoboslab/pl_mpeg
 * stb       - https://github.com/nothings/stb 

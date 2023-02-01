@@ -1,4 +1,4 @@
-(****************************************************************************
+﻿(****************************************************************************
                                                                       
     .:-======-:.  :---------::.       .----:                .         
   -+************= +*************=:    -****+                 .:.      
@@ -25,6 +25,7 @@ Includes the following open-sources libraries:
 * SDL3      - https://github.com/libsdl-org/SDL
 * miniaudio - https://github.com/mackron/miniaudio
 * Nuklear   - https://github.com/Immediate-Mode-UI/Nuklear
+* Parson    - https://github.com/kgabis/parson
 * physfs    - https://github.com/icculus/physfs
 * pl_mpeg   - https://github.com/phoboslab/pl_mpeg
 * stb       - https://github.com/nothings/stb 
@@ -459,6 +460,16 @@ const
   TMX_FLIPPED_VERTICALLY = $40000000;
   TMX_FLIPPED_DIAGONALLY = $20000000;
   TMX_FLIP_BITS_REMOVAL = $1FFFFFFF;
+  PARSON_VERSION_MAJOR = 1;
+  PARSON_VERSION_MINOR = 5;
+  PARSON_VERSION_PATCH = 0;
+  PARSON_VERSION_STRING = '1.5.0';
+  NBN_ERROR = -1;
+  NBN_RPC_MAX_PARAM_COUNT = 16;
+  NBN_RPC_MAX = 32;
+  NBN_RPC_STRING_MAX_LENGTH = 256;
+  NBN_MAX_CLIENTS = 1024;
+  NBN_CONNECTION_VECTOR_INITIAL_CAPACITY = 32;
 
 type
   // Forward declarations
@@ -479,6 +490,12 @@ type
   PPSDL_hid_device_ = ^PSDL_hid_device_;
   Pnk_style_slide = Pointer;
   PPnk_style_slide = ^Pnk_style_slide;
+  Pjson_object_t = Pointer;
+  PPjson_object_t = ^Pjson_object_t;
+  Pjson_array_t = Pointer;
+  PPjson_array_t = ^Pjson_array_t;
+  Pjson_value_t = Pointer;
+  PPjson_value_t = ^Pjson_value_t;
   PSDL_AssertData = ^SDL_AssertData;
   PSDL_atomic_t = ^SDL_atomic_t;
   PSDL_RWops = ^SDL_RWops;
@@ -830,6 +847,12 @@ type
   P_tmx_map = ^_tmx_map;
   Ptmx_col_bytes = ^tmx_col_bytes;
   Ptmx_col_floats = ^tmx_col_floats;
+  PNBN_RPC_Signature = ^NBN_RPC_Signature;
+  PNBN_ConnectionStats = ^NBN_ConnectionStats;
+  PNBN_OutgoingMessage = ^NBN_OutgoingMessage;
+  PNBN_MessageInfo = ^NBN_MessageInfo;
+  PNBN_ConnectionVector = ^NBN_ConnectionVector;
+  PNBN_GameServerStats = ^NBN_GameServerStats;
 
   SDL_bool = (
     SDL_FALSE = 0,
@@ -7603,6 +7626,106 @@ type
     E_MISSEL = 30);
   P_tmx_error_codes = ^_tmx_error_codes;
   tmx_error_codes = _tmx_error_codes;
+  PJSON_Object = Pointer;
+  PPJSON_Object = ^PJSON_Object;
+  PJSON_Array = Pointer;
+  PPJSON_Array = ^PJSON_Array;
+  PJSON_Value = Pointer;
+  PPJSON_Value = ^PJSON_Value;
+
+  json_value_types = (
+    JSONError = -1,
+    JSONNull = 1,
+    JSONString = 2,
+    JSONNumber = 3,
+    JSONObject = 4,
+    JSONArray = 5,
+    JSONBoolean = 6);
+  Pjson_value_type = ^json_value_type;
+  JSON_Value_Type = Integer;
+
+  json_result_t = (
+    JSONSuccess = 0,
+    JSONFailure = -1);
+  Pjson_result_t = ^json_result_t;
+  JSON_Status = Integer;
+
+  JSON_Malloc_Function = function(p1: NativeUInt): Pointer; cdecl;
+
+  JSON_Free_Function = procedure(p1: Pointer); cdecl;
+
+  JSON_Number_Serialization_Function = function(num: Double; buf: PUTF8Char): Integer; cdecl;
+  PNBN_Stream = Pointer;
+  PPNBN_Stream = ^PNBN_Stream;
+  PNBN_Connection = Pointer;
+  PPNBN_Connection = ^PNBN_Connection;
+  PNBN_Channel = Pointer;
+  PPNBN_Channel = ^PNBN_Channel;
+
+  NBN_MessageSerializer = function(p1: Pointer; p2: PNBN_Stream): Integer; cdecl;
+
+  NBN_MessageBuilder = function(): Pointer; cdecl;
+
+  NBN_MessageDestructor = procedure(p1: Pointer); cdecl;
+  PNBN_Endpoint = Pointer;
+  PPNBN_Endpoint = ^PNBN_Endpoint;
+
+  NBN_RPC_ParamType = (
+    NBN_RPC_PARAM_INT = 0,
+    NBN_RPC_PARAM_FLOAT = 1,
+    NBN_RPC_PARAM_BOOL = 2,
+    NBN_RPC_PARAM_STRING = 3);
+  PNBN_RPC_ParamType = ^NBN_RPC_ParamType;
+
+  NBN_RPC_Signature = record
+    param_count: Cardinal;
+    params: array [0..15] of NBN_RPC_ParamType;
+  end;
+
+  NBN_ConnectionStats = record
+    ping: Double;
+    total_lost_packets: Cardinal;
+    packet_loss: Single;
+    upload_bandwidth: Single;
+    download_bandwidth: Single;
+  end;
+
+  NBN_OutgoingMessage = record
+    type_: UInt8;
+    ref_count: Cardinal;
+    data: Pointer;
+  end;
+
+  NBN_MessageInfo = record
+    type_: UInt8;
+    data: Pointer;
+    sender: PNBN_Connection;
+  end;
+
+  NBN_RPC_Func = procedure(p1: Cardinal; NBN_RPC_Param: PInteger; sender: PNBN_Connection); cdecl;
+
+  NBN_ConnectionVector = record
+    connections: PPNBN_Connection;
+    count: Cardinal;
+    capacity: Cardinal;
+  end;
+
+  _anonymous_type_96 = (
+    NBN_CONNECTED = 2,
+    NBN_DISCONNECTED = 3,
+    NBN_MESSAGE_RECEIVED = 4);
+  P_anonymous_type_96 = ^_anonymous_type_96;
+
+  _anonymous_type_97 = (
+    NBN_NEW_CONNECTION = 2,
+    NBN_CLIENT_DISCONNECTED = 3,
+    NBN_CLIENT_MESSAGE_RECEIVED = 4);
+  P_anonymous_type_97 = ^_anonymous_type_97;
+
+  NBN_GameServerStats = record
+    upload_bandwidth: Single;
+    download_bandwidth: Single;
+  end;
 
   Ttmx_img_load_func = function(const path: PUTF8Char): Pointer; cdecl;
   Ttmx_img_free_func = procedure(address: Pointer); cdecl;
@@ -10101,6 +10224,165 @@ var
   tmx_alloc_func: Ptmx_alloc_func;
   tmx_img_free_func: Ptmx_img_free_func;
   tmx_img_load_func: Ptmx_img_load_func;
+  json_set_allocation_functions: procedure(malloc_fun: JSON_Malloc_Function; free_fun: JSON_Free_Function); cdecl;
+  json_set_escape_slashes: procedure(escape_slashes: Integer); cdecl;
+  json_set_float_serialization_format: procedure(const format: PUTF8Char); cdecl;
+  json_set_number_serialization_function: procedure(fun: JSON_Number_Serialization_Function); cdecl;
+  json_parse_file: function(const filename: PUTF8Char): PJSON_Value; cdecl;
+  json_parse_file_with_comments: function(const filename: PUTF8Char): PJSON_Value; cdecl;
+  json_parse_string: function(const string_: PUTF8Char): PJSON_Value; cdecl;
+  json_parse_string_with_comments: function(const string_: PUTF8Char): PJSON_Value; cdecl;
+  json_serialization_size: function(const value: PJSON_Value): NativeUInt; cdecl;
+  json_serialize_to_buffer: function(const value: PJSON_Value; buf: PUTF8Char; buf_size_in_bytes: NativeUInt): JSON_Status; cdecl;
+  json_serialize_to_file: function(const value: PJSON_Value; const filename: PUTF8Char): JSON_Status; cdecl;
+  json_serialize_to_string: function(const value: PJSON_Value): PUTF8Char; cdecl;
+  json_serialization_size_pretty: function(const value: PJSON_Value): NativeUInt; cdecl;
+  json_serialize_to_buffer_pretty: function(const value: PJSON_Value; buf: PUTF8Char; buf_size_in_bytes: NativeUInt): JSON_Status; cdecl;
+  json_serialize_to_file_pretty: function(const value: PJSON_Value; const filename: PUTF8Char): JSON_Status; cdecl;
+  json_serialize_to_string_pretty: function(const value: PJSON_Value): PUTF8Char; cdecl;
+  json_free_serialized_string: procedure(string_: PUTF8Char); cdecl;
+  json_value_equals: function(const a: PJSON_Value; const b: PJSON_Value): Integer; cdecl;
+  json_validate: function(const schema: PJSON_Value; const value: PJSON_Value): JSON_Status; cdecl;
+  json_object_get_value: function(const object_: PJSON_Object; const name: PUTF8Char): PJSON_Value; cdecl;
+  json_object_get_string: function(const object_: PJSON_Object; const name: PUTF8Char): PUTF8Char; cdecl;
+  json_object_get_string_len: function(const object_: PJSON_Object; const name: PUTF8Char): NativeUInt; cdecl;
+  json_object_get_object: function(const object_: PJSON_Object; const name: PUTF8Char): PJSON_Object; cdecl;
+  json_object_get_array: function(const object_: PJSON_Object; const name: PUTF8Char): PJSON_Array; cdecl;
+  json_object_get_number: function(const object_: PJSON_Object; const name: PUTF8Char): Double; cdecl;
+  json_object_get_boolean: function(const object_: PJSON_Object; const name: PUTF8Char): Integer; cdecl;
+  json_object_dotget_value: function(const object_: PJSON_Object; const name: PUTF8Char): PJSON_Value; cdecl;
+  json_object_dotget_string: function(const object_: PJSON_Object; const name: PUTF8Char): PUTF8Char; cdecl;
+  json_object_dotget_string_len: function(const object_: PJSON_Object; const name: PUTF8Char): NativeUInt; cdecl;
+  json_object_dotget_object: function(const object_: PJSON_Object; const name: PUTF8Char): PJSON_Object; cdecl;
+  json_object_dotget_array: function(const object_: PJSON_Object; const name: PUTF8Char): PJSON_Array; cdecl;
+  json_object_dotget_number: function(const object_: PJSON_Object; const name: PUTF8Char): Double; cdecl;
+  json_object_dotget_boolean: function(const object_: PJSON_Object; const name: PUTF8Char): Integer; cdecl;
+  json_object_get_count: function(const object_: PJSON_Object): NativeUInt; cdecl;
+  json_object_get_name: function(const object_: PJSON_Object; index: NativeUInt): PUTF8Char; cdecl;
+  json_object_get_value_at: function(const object_: PJSON_Object; index: NativeUInt): PJSON_Value; cdecl;
+  json_object_get_wrapping_value: function(const object_: PJSON_Object): PJSON_Value; cdecl;
+  json_object_has_value: function(const object_: PJSON_Object; const name: PUTF8Char): Integer; cdecl;
+  json_object_has_value_of_type: function(const object_: PJSON_Object; const name: PUTF8Char; type_: JSON_Value_Type): Integer; cdecl;
+  json_object_dothas_value: function(const object_: PJSON_Object; const name: PUTF8Char): Integer; cdecl;
+  json_object_dothas_value_of_type: function(const object_: PJSON_Object; const name: PUTF8Char; type_: JSON_Value_Type): Integer; cdecl;
+  json_object_set_value: function(object_: PJSON_Object; const name: PUTF8Char; value: PJSON_Value): JSON_Status; cdecl;
+  json_object_set_string: function(object_: PJSON_Object; const name: PUTF8Char; const string_: PUTF8Char): JSON_Status; cdecl;
+  json_object_set_string_with_len: function(object_: PJSON_Object; const name: PUTF8Char; const string_: PUTF8Char; len: NativeUInt): JSON_Status; cdecl;
+  json_object_set_number: function(object_: PJSON_Object; const name: PUTF8Char; number: Double): JSON_Status; cdecl;
+  json_object_set_boolean: function(object_: PJSON_Object; const name: PUTF8Char; boolean: Integer): JSON_Status; cdecl;
+  json_object_set_null: function(object_: PJSON_Object; const name: PUTF8Char): JSON_Status; cdecl;
+  json_object_dotset_value: function(object_: PJSON_Object; const name: PUTF8Char; value: PJSON_Value): JSON_Status; cdecl;
+  json_object_dotset_string: function(object_: PJSON_Object; const name: PUTF8Char; const string_: PUTF8Char): JSON_Status; cdecl;
+  json_object_dotset_string_with_len: function(object_: PJSON_Object; const name: PUTF8Char; const string_: PUTF8Char; len: NativeUInt): JSON_Status; cdecl;
+  json_object_dotset_number: function(object_: PJSON_Object; const name: PUTF8Char; number: Double): JSON_Status; cdecl;
+  json_object_dotset_boolean: function(object_: PJSON_Object; const name: PUTF8Char; boolean: Integer): JSON_Status; cdecl;
+  json_object_dotset_null: function(object_: PJSON_Object; const name: PUTF8Char): JSON_Status; cdecl;
+  json_object_remove: function(object_: PJSON_Object; const name: PUTF8Char): JSON_Status; cdecl;
+  json_object_dotremove: function(object_: PJSON_Object; const key: PUTF8Char): JSON_Status; cdecl;
+  json_object_clear: function(object_: PJSON_Object): JSON_Status; cdecl;
+  json_array_get_value: function(const array_: PJSON_Array; index: NativeUInt): PJSON_Value; cdecl;
+  json_array_get_string: function(const array_: PJSON_Array; index: NativeUInt): PUTF8Char; cdecl;
+  json_array_get_string_len: function(const array_: PJSON_Array; index: NativeUInt): NativeUInt; cdecl;
+  json_array_get_object: function(const array_: PJSON_Array; index: NativeUInt): PJSON_Object; cdecl;
+  json_array_get_array: function(const array_: PJSON_Array; index: NativeUInt): PJSON_Array; cdecl;
+  json_array_get_number: function(const array_: PJSON_Array; index: NativeUInt): Double; cdecl;
+  json_array_get_boolean: function(const array_: PJSON_Array; index: NativeUInt): Integer; cdecl;
+  json_array_get_count: function(const array_: PJSON_Array): NativeUInt; cdecl;
+  json_array_get_wrapping_value: function(const array_: PJSON_Array): PJSON_Value; cdecl;
+  json_array_remove: function(array_: PJSON_Array; i: NativeUInt): JSON_Status; cdecl;
+  json_array_replace_value: function(array_: PJSON_Array; i: NativeUInt; value: PJSON_Value): JSON_Status; cdecl;
+  json_array_replace_string: function(array_: PJSON_Array; i: NativeUInt; const string_: PUTF8Char): JSON_Status; cdecl;
+  json_array_replace_string_with_len: function(array_: PJSON_Array; i: NativeUInt; const string_: PUTF8Char; len: NativeUInt): JSON_Status; cdecl;
+  json_array_replace_number: function(array_: PJSON_Array; i: NativeUInt; number: Double): JSON_Status; cdecl;
+  json_array_replace_boolean: function(array_: PJSON_Array; i: NativeUInt; boolean: Integer): JSON_Status; cdecl;
+  json_array_replace_null: function(array_: PJSON_Array; i: NativeUInt): JSON_Status; cdecl;
+  json_array_clear: function(array_: PJSON_Array): JSON_Status; cdecl;
+  json_array_append_value: function(array_: PJSON_Array; value: PJSON_Value): JSON_Status; cdecl;
+  json_array_append_string: function(array_: PJSON_Array; const string_: PUTF8Char): JSON_Status; cdecl;
+  json_array_append_string_with_len: function(array_: PJSON_Array; const string_: PUTF8Char; len: NativeUInt): JSON_Status; cdecl;
+  json_array_append_number: function(array_: PJSON_Array; number: Double): JSON_Status; cdecl;
+  json_array_append_boolean: function(array_: PJSON_Array; boolean: Integer): JSON_Status; cdecl;
+  json_array_append_null: function(array_: PJSON_Array): JSON_Status; cdecl;
+  json_value_init_object: function(): PJSON_Value; cdecl;
+  json_value_init_array: function(): PJSON_Value; cdecl;
+  json_value_init_string: function(const string_: PUTF8Char): PJSON_Value; cdecl;
+  json_value_init_string_with_len: function(const string_: PUTF8Char; length: NativeUInt): PJSON_Value; cdecl;
+  json_value_init_number: function(number: Double): PJSON_Value; cdecl;
+  json_value_init_boolean: function(boolean: Integer): PJSON_Value; cdecl;
+  json_value_init_null: function(): PJSON_Value; cdecl;
+  json_value_deep_copy: function(const value: PJSON_Value): PJSON_Value; cdecl;
+  json_value_free: procedure(value: PJSON_Value); cdecl;
+  json_value_get_type: function(const value: PJSON_Value): JSON_Value_Type; cdecl;
+  json_value_get_object: function(const value: PJSON_Value): PJSON_Object; cdecl;
+  json_value_get_array: function(const value: PJSON_Value): PJSON_Array; cdecl;
+  json_value_get_string: function(const value: PJSON_Value): PUTF8Char; cdecl;
+  json_value_get_string_len: function(const value: PJSON_Value): NativeUInt; cdecl;
+  json_value_get_number: function(const value: PJSON_Value): Double; cdecl;
+  json_value_get_boolean: function(const value: PJSON_Value): Integer; cdecl;
+  json_value_get_parent: function(const value: PJSON_Value): PJSON_Value; cdecl;
+  json_type: function(const value: PJSON_Value): JSON_Value_Type; cdecl;
+  json_object: function(const value: PJSON_Value): PJSON_Object; cdecl;
+  json_array: function(const value: PJSON_Value): PJSON_Array; cdecl;
+  json_string: function(const value: PJSON_Value): PUTF8Char; cdecl;
+  json_string_len: function(const value: PJSON_Value): NativeUInt; cdecl;
+  json_number: function(const value: PJSON_Value): Double; cdecl;
+  json_boolean: function(const value: PJSON_Value): Integer; cdecl;
+  NBN_GameClient_Start: function(const protocol_name: PUTF8Char; const ip_address: PUTF8Char; port: UInt16; encryption: Boolean; connection_data: PUInt8): Integer; cdecl;
+  NBN_GameClient_Disconnect: function(): Integer; cdecl;
+  NBN_GameClient_Stop: procedure(); cdecl;
+  NBN_GameClient_RegisterMessage: procedure(msg_type: UInt8; msg_builder: NBN_MessageBuilder; msg_destructor: NBN_MessageDestructor; msg_serializer: NBN_MessageSerializer); cdecl;
+  NBN_GameClient_RegisterChannel: procedure(type_: UInt8; id: UInt8); cdecl;
+  NBN_GameClient_AddTime: procedure(time: Double); cdecl;
+  NBN_GameClient_Poll: function(): Integer; cdecl;
+  NBN_GameClient_SendPackets: function(): Integer; cdecl;
+  NBN_GameClient_SetContext: procedure(context: Pointer); cdecl;
+  NBN_GameClient_GetContext: function(): Pointer; cdecl;
+  NBN_GameClient_CreateMessage: function(msg_type: UInt8; msg_data: Pointer): PNBN_OutgoingMessage; cdecl;
+  NBN_GameClient_CreateByteArrayMessage: function(bytes: PUInt8; length: Cardinal): PNBN_OutgoingMessage; cdecl;
+  NBN_GameClient_SendMessage: function(outgoing_msg: PNBN_OutgoingMessage; channel_id: UInt8): Integer; cdecl;
+  NBN_GameClient_SendUnreliableMessage: function(outgoing_msg: PNBN_OutgoingMessage): Integer; cdecl;
+  NBN_GameClient_SendReliableMessage: function(outgoing_msg: PNBN_OutgoingMessage): Integer; cdecl;
+  NBN_GameClient_CreateServerConnection: function(driver_data: Pointer): PNBN_Connection; cdecl;
+  NBN_GameClient_GetMessageInfo: function(): NBN_MessageInfo; cdecl;
+  NBN_GameClient_GetStats: function(): NBN_ConnectionStats; cdecl;
+  NBN_GameClient_GetServerCloseCode: function(): Integer; cdecl;
+  NBN_GameClient_GetAcceptDataReadStream: function(): PNBN_Stream; cdecl;
+  NBN_GameClient_IsConnected: function(): Boolean; cdecl;
+  NBN_GameClient_IsEncryptionEnabled: function(): Boolean; cdecl;
+  NBN_GameClient_RegisterRPC: function(id: Integer; signature: NBN_RPC_Signature; func: NBN_RPC_Func): Integer; cdecl;
+  NBN_GameClient_CallRPC: function(id: Cardinal): Integer varargs; cdecl;
+  NBN_GameServer_Start: function(const protocol_name: PUTF8Char; port: UInt16; encryption: Boolean): Integer; cdecl;
+  NBN_GameServer_Stop: procedure(); cdecl;
+  NBN_GameServer_RegisterMessage: procedure(msg_type: UInt8; msg_builder: NBN_MessageBuilder; msg_destructor: NBN_MessageDestructor; msg_serializer: NBN_MessageSerializer); cdecl;
+  NBN_GameServer_RegisterChannel: procedure(type_: UInt8; id: UInt8); cdecl;
+  NBN_GameServer_AddTime: procedure(time: Double); cdecl;
+  NBN_GameServer_Poll: function(): Integer; cdecl;
+  NBN_GameServer_SendPackets: function(): Integer; cdecl;
+  NBN_GameServer_SetContext: procedure(context: Pointer); cdecl;
+  NBN_GameServer_GetContext: function(): Pointer; cdecl;
+  NBN_GameServer_CreateClientConnection: function(p1: UInt32; p2: Pointer): PNBN_Connection; cdecl;
+  NBN_GameServer_CloseClient: function(client: PNBN_Connection): Integer; cdecl;
+  NBN_GameServer_CloseClientWithCode: function(client: PNBN_Connection; code: Integer): Integer; cdecl;
+  NBN_GameServer_CreateMessage: function(msg_type: UInt8; msg_data: Pointer): PNBN_OutgoingMessage; cdecl;
+  NBN_GameServer_CreateByteArrayMessage: function(bytes: PUInt8; length: Cardinal): PNBN_OutgoingMessage; cdecl;
+  NBN_GameServer_SendMessageTo: function(client: PNBN_Connection; outgoing_msg: PNBN_OutgoingMessage; channel_id: UInt8): Integer; cdecl;
+  NBN_GameServer_SendUnreliableMessageTo: function(client: PNBN_Connection; outgoing_msg: PNBN_OutgoingMessage): Integer; cdecl;
+  NBN_GameServer_SendReliableMessageTo: function(client: PNBN_Connection; outgoing_msg: PNBN_OutgoingMessage): Integer; cdecl;
+  NBN_GameServer_BroadcastMessage: function(outgoing_msg: PNBN_OutgoingMessage; channel_id: UInt8): Integer; cdecl;
+  NBN_GameServer_BroadcastUnreliableMessage: function(outgoing_msg: PNBN_OutgoingMessage): Integer; cdecl;
+  NBN_GameServer_BroadcastReliableMessage: function(outgoing_msg: PNBN_OutgoingMessage): Integer; cdecl;
+  NBN_GameServer_GetConnectionAcceptDataWriteStream: function(client: PNBN_Connection): PNBN_Stream; cdecl;
+  NBN_GameServer_AcceptIncomingConnection: function(): Integer; cdecl;
+  NBN_GameServer_RejectIncomingConnectionWithCode: function(code: Integer): Integer; cdecl;
+  NBN_GameServer_RejectIncomingConnection: function(): Integer; cdecl;
+  NBN_GameServer_GetIncomingConnection: function(): PNBN_Connection; cdecl;
+  NBN_GameServer_GetConnectionData: function(client: PNBN_Connection): PUInt8; cdecl;
+  NBN_GameServer_GetDisconnectedClient: function(): PNBN_Connection; cdecl;
+  NBN_GameServer_GetMessageInfo: function(): NBN_MessageInfo; cdecl;
+  NBN_GameServer_GetStats: function(): NBN_GameServerStats; cdecl;
+  NBN_GameServer_IsEncryptionEnabled: function(): Boolean; cdecl;
+  NBN_GameServer_RegisterRPC: function(id: Integer; signature: NBN_RPC_Signature; func: NBN_RPC_Func): Integer; cdecl;
+  NBN_GameServer_CallRPC: function(id: Cardinal; client: PNBN_Connection): Integer varargs; cdecl;
 
 implementation
 
@@ -10380,6 +10662,109 @@ begin
 {$REGION 'Exports'}
   if not Assigned(aDllHandle) then Exit;
   crc32 := MemoryGetProcAddress(aDLLHandle, 'crc32');
+  json_array := MemoryGetProcAddress(aDLLHandle, 'json_array');
+  json_array_append_boolean := MemoryGetProcAddress(aDLLHandle, 'json_array_append_boolean');
+  json_array_append_null := MemoryGetProcAddress(aDLLHandle, 'json_array_append_null');
+  json_array_append_number := MemoryGetProcAddress(aDLLHandle, 'json_array_append_number');
+  json_array_append_string := MemoryGetProcAddress(aDLLHandle, 'json_array_append_string');
+  json_array_append_string_with_len := MemoryGetProcAddress(aDLLHandle, 'json_array_append_string_with_len');
+  json_array_append_value := MemoryGetProcAddress(aDLLHandle, 'json_array_append_value');
+  json_array_clear := MemoryGetProcAddress(aDLLHandle, 'json_array_clear');
+  json_array_get_array := MemoryGetProcAddress(aDLLHandle, 'json_array_get_array');
+  json_array_get_boolean := MemoryGetProcAddress(aDLLHandle, 'json_array_get_boolean');
+  json_array_get_count := MemoryGetProcAddress(aDLLHandle, 'json_array_get_count');
+  json_array_get_number := MemoryGetProcAddress(aDLLHandle, 'json_array_get_number');
+  json_array_get_object := MemoryGetProcAddress(aDLLHandle, 'json_array_get_object');
+  json_array_get_string := MemoryGetProcAddress(aDLLHandle, 'json_array_get_string');
+  json_array_get_string_len := MemoryGetProcAddress(aDLLHandle, 'json_array_get_string_len');
+  json_array_get_value := MemoryGetProcAddress(aDLLHandle, 'json_array_get_value');
+  json_array_get_wrapping_value := MemoryGetProcAddress(aDLLHandle, 'json_array_get_wrapping_value');
+  json_array_remove := MemoryGetProcAddress(aDLLHandle, 'json_array_remove');
+  json_array_replace_boolean := MemoryGetProcAddress(aDLLHandle, 'json_array_replace_boolean');
+  json_array_replace_null := MemoryGetProcAddress(aDLLHandle, 'json_array_replace_null');
+  json_array_replace_number := MemoryGetProcAddress(aDLLHandle, 'json_array_replace_number');
+  json_array_replace_string := MemoryGetProcAddress(aDLLHandle, 'json_array_replace_string');
+  json_array_replace_string_with_len := MemoryGetProcAddress(aDLLHandle, 'json_array_replace_string_with_len');
+  json_array_replace_value := MemoryGetProcAddress(aDLLHandle, 'json_array_replace_value');
+  json_boolean := MemoryGetProcAddress(aDLLHandle, 'json_boolean');
+  json_free_serialized_string := MemoryGetProcAddress(aDLLHandle, 'json_free_serialized_string');
+  json_number := MemoryGetProcAddress(aDLLHandle, 'json_number');
+  json_object := MemoryGetProcAddress(aDLLHandle, 'json_object');
+  json_object_clear := MemoryGetProcAddress(aDLLHandle, 'json_object_clear');
+  json_object_dotget_array := MemoryGetProcAddress(aDLLHandle, 'json_object_dotget_array');
+  json_object_dotget_boolean := MemoryGetProcAddress(aDLLHandle, 'json_object_dotget_boolean');
+  json_object_dotget_number := MemoryGetProcAddress(aDLLHandle, 'json_object_dotget_number');
+  json_object_dotget_object := MemoryGetProcAddress(aDLLHandle, 'json_object_dotget_object');
+  json_object_dotget_string := MemoryGetProcAddress(aDLLHandle, 'json_object_dotget_string');
+  json_object_dotget_string_len := MemoryGetProcAddress(aDLLHandle, 'json_object_dotget_string_len');
+  json_object_dotget_value := MemoryGetProcAddress(aDLLHandle, 'json_object_dotget_value');
+  json_object_dothas_value := MemoryGetProcAddress(aDLLHandle, 'json_object_dothas_value');
+  json_object_dothas_value_of_type := MemoryGetProcAddress(aDLLHandle, 'json_object_dothas_value_of_type');
+  json_object_dotremove := MemoryGetProcAddress(aDLLHandle, 'json_object_dotremove');
+  json_object_dotset_boolean := MemoryGetProcAddress(aDLLHandle, 'json_object_dotset_boolean');
+  json_object_dotset_null := MemoryGetProcAddress(aDLLHandle, 'json_object_dotset_null');
+  json_object_dotset_number := MemoryGetProcAddress(aDLLHandle, 'json_object_dotset_number');
+  json_object_dotset_string := MemoryGetProcAddress(aDLLHandle, 'json_object_dotset_string');
+  json_object_dotset_string_with_len := MemoryGetProcAddress(aDLLHandle, 'json_object_dotset_string_with_len');
+  json_object_dotset_value := MemoryGetProcAddress(aDLLHandle, 'json_object_dotset_value');
+  json_object_get_array := MemoryGetProcAddress(aDLLHandle, 'json_object_get_array');
+  json_object_get_boolean := MemoryGetProcAddress(aDLLHandle, 'json_object_get_boolean');
+  json_object_get_count := MemoryGetProcAddress(aDLLHandle, 'json_object_get_count');
+  json_object_get_name := MemoryGetProcAddress(aDLLHandle, 'json_object_get_name');
+  json_object_get_number := MemoryGetProcAddress(aDLLHandle, 'json_object_get_number');
+  json_object_get_object := MemoryGetProcAddress(aDLLHandle, 'json_object_get_object');
+  json_object_get_string := MemoryGetProcAddress(aDLLHandle, 'json_object_get_string');
+  json_object_get_string_len := MemoryGetProcAddress(aDLLHandle, 'json_object_get_string_len');
+  json_object_get_value := MemoryGetProcAddress(aDLLHandle, 'json_object_get_value');
+  json_object_get_value_at := MemoryGetProcAddress(aDLLHandle, 'json_object_get_value_at');
+  json_object_get_wrapping_value := MemoryGetProcAddress(aDLLHandle, 'json_object_get_wrapping_value');
+  json_object_has_value := MemoryGetProcAddress(aDLLHandle, 'json_object_has_value');
+  json_object_has_value_of_type := MemoryGetProcAddress(aDLLHandle, 'json_object_has_value_of_type');
+  json_object_remove := MemoryGetProcAddress(aDLLHandle, 'json_object_remove');
+  json_object_set_boolean := MemoryGetProcAddress(aDLLHandle, 'json_object_set_boolean');
+  json_object_set_null := MemoryGetProcAddress(aDLLHandle, 'json_object_set_null');
+  json_object_set_number := MemoryGetProcAddress(aDLLHandle, 'json_object_set_number');
+  json_object_set_string := MemoryGetProcAddress(aDLLHandle, 'json_object_set_string');
+  json_object_set_string_with_len := MemoryGetProcAddress(aDLLHandle, 'json_object_set_string_with_len');
+  json_object_set_value := MemoryGetProcAddress(aDLLHandle, 'json_object_set_value');
+  json_parse_file := MemoryGetProcAddress(aDLLHandle, 'json_parse_file');
+  json_parse_file_with_comments := MemoryGetProcAddress(aDLLHandle, 'json_parse_file_with_comments');
+  json_parse_string := MemoryGetProcAddress(aDLLHandle, 'json_parse_string');
+  json_parse_string_with_comments := MemoryGetProcAddress(aDLLHandle, 'json_parse_string_with_comments');
+  json_serialization_size := MemoryGetProcAddress(aDLLHandle, 'json_serialization_size');
+  json_serialization_size_pretty := MemoryGetProcAddress(aDLLHandle, 'json_serialization_size_pretty');
+  json_serialize_to_buffer := MemoryGetProcAddress(aDLLHandle, 'json_serialize_to_buffer');
+  json_serialize_to_buffer_pretty := MemoryGetProcAddress(aDLLHandle, 'json_serialize_to_buffer_pretty');
+  json_serialize_to_file := MemoryGetProcAddress(aDLLHandle, 'json_serialize_to_file');
+  json_serialize_to_file_pretty := MemoryGetProcAddress(aDLLHandle, 'json_serialize_to_file_pretty');
+  json_serialize_to_string := MemoryGetProcAddress(aDLLHandle, 'json_serialize_to_string');
+  json_serialize_to_string_pretty := MemoryGetProcAddress(aDLLHandle, 'json_serialize_to_string_pretty');
+  json_set_allocation_functions := MemoryGetProcAddress(aDLLHandle, 'json_set_allocation_functions');
+  json_set_escape_slashes := MemoryGetProcAddress(aDLLHandle, 'json_set_escape_slashes');
+  json_set_float_serialization_format := MemoryGetProcAddress(aDLLHandle, 'json_set_float_serialization_format');
+  json_set_number_serialization_function := MemoryGetProcAddress(aDLLHandle, 'json_set_number_serialization_function');
+  json_string := MemoryGetProcAddress(aDLLHandle, 'json_string');
+  json_string_len := MemoryGetProcAddress(aDLLHandle, 'json_string_len');
+  json_type := MemoryGetProcAddress(aDLLHandle, 'json_type');
+  json_validate := MemoryGetProcAddress(aDLLHandle, 'json_validate');
+  json_value_deep_copy := MemoryGetProcAddress(aDLLHandle, 'json_value_deep_copy');
+  json_value_equals := MemoryGetProcAddress(aDLLHandle, 'json_value_equals');
+  json_value_free := MemoryGetProcAddress(aDLLHandle, 'json_value_free');
+  json_value_get_array := MemoryGetProcAddress(aDLLHandle, 'json_value_get_array');
+  json_value_get_boolean := MemoryGetProcAddress(aDLLHandle, 'json_value_get_boolean');
+  json_value_get_number := MemoryGetProcAddress(aDLLHandle, 'json_value_get_number');
+  json_value_get_object := MemoryGetProcAddress(aDLLHandle, 'json_value_get_object');
+  json_value_get_parent := MemoryGetProcAddress(aDLLHandle, 'json_value_get_parent');
+  json_value_get_string := MemoryGetProcAddress(aDLLHandle, 'json_value_get_string');
+  json_value_get_string_len := MemoryGetProcAddress(aDLLHandle, 'json_value_get_string_len');
+  json_value_get_type := MemoryGetProcAddress(aDLLHandle, 'json_value_get_type');
+  json_value_init_array := MemoryGetProcAddress(aDLLHandle, 'json_value_init_array');
+  json_value_init_boolean := MemoryGetProcAddress(aDLLHandle, 'json_value_init_boolean');
+  json_value_init_null := MemoryGetProcAddress(aDLLHandle, 'json_value_init_null');
+  json_value_init_number := MemoryGetProcAddress(aDLLHandle, 'json_value_init_number');
+  json_value_init_object := MemoryGetProcAddress(aDLLHandle, 'json_value_init_object');
+  json_value_init_string := MemoryGetProcAddress(aDLLHandle, 'json_value_init_string');
+  json_value_init_string_with_len := MemoryGetProcAddress(aDLLHandle, 'json_value_init_string_with_len');
   ma_aligned_free := MemoryGetProcAddress(aDLLHandle, 'ma_aligned_free');
   ma_aligned_malloc := MemoryGetProcAddress(aDLLHandle, 'ma_aligned_malloc');
   ma_apply_volume_factor_f32 := MemoryGetProcAddress(aDLLHandle, 'ma_apply_volume_factor_f32');
@@ -11264,6 +11649,62 @@ begin
   ma_waveform_set_sample_rate := MemoryGetProcAddress(aDLLHandle, 'ma_waveform_set_sample_rate');
   ma_waveform_set_type := MemoryGetProcAddress(aDLLHandle, 'ma_waveform_set_type');
   ma_waveform_uninit := MemoryGetProcAddress(aDLLHandle, 'ma_waveform_uninit');
+  NBN_GameClient_AddTime := MemoryGetProcAddress(aDLLHandle, 'NBN_GameClient_AddTime');
+  NBN_GameClient_CallRPC := MemoryGetProcAddress(aDLLHandle, 'NBN_GameClient_CallRPC');
+  NBN_GameClient_CreateByteArrayMessage := MemoryGetProcAddress(aDLLHandle, 'NBN_GameClient_CreateByteArrayMessage');
+  NBN_GameClient_CreateMessage := MemoryGetProcAddress(aDLLHandle, 'NBN_GameClient_CreateMessage');
+  NBN_GameClient_CreateServerConnection := MemoryGetProcAddress(aDLLHandle, 'NBN_GameClient_CreateServerConnection');
+  NBN_GameClient_Disconnect := MemoryGetProcAddress(aDLLHandle, 'NBN_GameClient_Disconnect');
+  NBN_GameClient_GetAcceptDataReadStream := MemoryGetProcAddress(aDLLHandle, 'NBN_GameClient_GetAcceptDataReadStream');
+  NBN_GameClient_GetContext := MemoryGetProcAddress(aDLLHandle, 'NBN_GameClient_GetContext');
+  NBN_GameClient_GetMessageInfo := MemoryGetProcAddress(aDLLHandle, 'NBN_GameClient_GetMessageInfo');
+  NBN_GameClient_GetServerCloseCode := MemoryGetProcAddress(aDLLHandle, 'NBN_GameClient_GetServerCloseCode');
+  NBN_GameClient_GetStats := MemoryGetProcAddress(aDLLHandle, 'NBN_GameClient_GetStats');
+  NBN_GameClient_IsConnected := MemoryGetProcAddress(aDLLHandle, 'NBN_GameClient_IsConnected');
+  NBN_GameClient_IsEncryptionEnabled := MemoryGetProcAddress(aDLLHandle, 'NBN_GameClient_IsEncryptionEnabled');
+  NBN_GameClient_Poll := MemoryGetProcAddress(aDLLHandle, 'NBN_GameClient_Poll');
+  NBN_GameClient_RegisterChannel := MemoryGetProcAddress(aDLLHandle, 'NBN_GameClient_RegisterChannel');
+  NBN_GameClient_RegisterMessage := MemoryGetProcAddress(aDLLHandle, 'NBN_GameClient_RegisterMessage');
+  NBN_GameClient_RegisterRPC := MemoryGetProcAddress(aDLLHandle, 'NBN_GameClient_RegisterRPC');
+  NBN_GameClient_SendMessage := MemoryGetProcAddress(aDLLHandle, 'NBN_GameClient_SendMessage');
+  NBN_GameClient_SendPackets := MemoryGetProcAddress(aDLLHandle, 'NBN_GameClient_SendPackets');
+  NBN_GameClient_SendReliableMessage := MemoryGetProcAddress(aDLLHandle, 'NBN_GameClient_SendReliableMessage');
+  NBN_GameClient_SendUnreliableMessage := MemoryGetProcAddress(aDLLHandle, 'NBN_GameClient_SendUnreliableMessage');
+  NBN_GameClient_SetContext := MemoryGetProcAddress(aDLLHandle, 'NBN_GameClient_SetContext');
+  NBN_GameClient_Start := MemoryGetProcAddress(aDLLHandle, 'NBN_GameClient_Start');
+  NBN_GameClient_Stop := MemoryGetProcAddress(aDLLHandle, 'NBN_GameClient_Stop');
+  NBN_GameServer_AcceptIncomingConnection := MemoryGetProcAddress(aDLLHandle, 'NBN_GameServer_AcceptIncomingConnection');
+  NBN_GameServer_AddTime := MemoryGetProcAddress(aDLLHandle, 'NBN_GameServer_AddTime');
+  NBN_GameServer_BroadcastMessage := MemoryGetProcAddress(aDLLHandle, 'NBN_GameServer_BroadcastMessage');
+  NBN_GameServer_BroadcastReliableMessage := MemoryGetProcAddress(aDLLHandle, 'NBN_GameServer_BroadcastReliableMessage');
+  NBN_GameServer_BroadcastUnreliableMessage := MemoryGetProcAddress(aDLLHandle, 'NBN_GameServer_BroadcastUnreliableMessage');
+  NBN_GameServer_CallRPC := MemoryGetProcAddress(aDLLHandle, 'NBN_GameServer_CallRPC');
+  NBN_GameServer_CloseClient := MemoryGetProcAddress(aDLLHandle, 'NBN_GameServer_CloseClient');
+  NBN_GameServer_CloseClientWithCode := MemoryGetProcAddress(aDLLHandle, 'NBN_GameServer_CloseClientWithCode');
+  NBN_GameServer_CreateByteArrayMessage := MemoryGetProcAddress(aDLLHandle, 'NBN_GameServer_CreateByteArrayMessage');
+  NBN_GameServer_CreateClientConnection := MemoryGetProcAddress(aDLLHandle, 'NBN_GameServer_CreateClientConnection');
+  NBN_GameServer_CreateMessage := MemoryGetProcAddress(aDLLHandle, 'NBN_GameServer_CreateMessage');
+  NBN_GameServer_GetConnectionAcceptDataWriteStream := MemoryGetProcAddress(aDLLHandle, 'NBN_GameServer_GetConnectionAcceptDataWriteStream');
+  NBN_GameServer_GetConnectionData := MemoryGetProcAddress(aDLLHandle, 'NBN_GameServer_GetConnectionData');
+  NBN_GameServer_GetContext := MemoryGetProcAddress(aDLLHandle, 'NBN_GameServer_GetContext');
+  NBN_GameServer_GetDisconnectedClient := MemoryGetProcAddress(aDLLHandle, 'NBN_GameServer_GetDisconnectedClient');
+  NBN_GameServer_GetIncomingConnection := MemoryGetProcAddress(aDLLHandle, 'NBN_GameServer_GetIncomingConnection');
+  NBN_GameServer_GetMessageInfo := MemoryGetProcAddress(aDLLHandle, 'NBN_GameServer_GetMessageInfo');
+  NBN_GameServer_GetStats := MemoryGetProcAddress(aDLLHandle, 'NBN_GameServer_GetStats');
+  NBN_GameServer_IsEncryptionEnabled := MemoryGetProcAddress(aDLLHandle, 'NBN_GameServer_IsEncryptionEnabled');
+  NBN_GameServer_Poll := MemoryGetProcAddress(aDLLHandle, 'NBN_GameServer_Poll');
+  NBN_GameServer_RegisterChannel := MemoryGetProcAddress(aDLLHandle, 'NBN_GameServer_RegisterChannel');
+  NBN_GameServer_RegisterMessage := MemoryGetProcAddress(aDLLHandle, 'NBN_GameServer_RegisterMessage');
+  NBN_GameServer_RegisterRPC := MemoryGetProcAddress(aDLLHandle, 'NBN_GameServer_RegisterRPC');
+  NBN_GameServer_RejectIncomingConnection := MemoryGetProcAddress(aDLLHandle, 'NBN_GameServer_RejectIncomingConnection');
+  NBN_GameServer_RejectIncomingConnectionWithCode := MemoryGetProcAddress(aDLLHandle, 'NBN_GameServer_RejectIncomingConnectionWithCode');
+  NBN_GameServer_SendMessageTo := MemoryGetProcAddress(aDLLHandle, 'NBN_GameServer_SendMessageTo');
+  NBN_GameServer_SendPackets := MemoryGetProcAddress(aDLLHandle, 'NBN_GameServer_SendPackets');
+  NBN_GameServer_SendReliableMessageTo := MemoryGetProcAddress(aDLLHandle, 'NBN_GameServer_SendReliableMessageTo');
+  NBN_GameServer_SendUnreliableMessageTo := MemoryGetProcAddress(aDLLHandle, 'NBN_GameServer_SendUnreliableMessageTo');
+  NBN_GameServer_SetContext := MemoryGetProcAddress(aDLLHandle, 'NBN_GameServer_SetContext');
+  NBN_GameServer_Start := MemoryGetProcAddress(aDLLHandle, 'NBN_GameServer_Start');
+  NBN_GameServer_Stop := MemoryGetProcAddress(aDLLHandle, 'NBN_GameServer_Stop');
   nk__begin := MemoryGetProcAddress(aDLLHandle, 'nk__begin');
   nk__draw_begin := MemoryGetProcAddress(aDLLHandle, 'nk__draw_begin');
   nk__draw_end := MemoryGetProcAddress(aDLLHandle, 'nk__draw_end');
