@@ -94,8 +94,8 @@ begin
   SDL_Init(SDL_INIT_EVERYTHING);
 
   win := SDL_CreateWindow('Hello World, welcome to SDL3 for Pascal!', SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, 0);
-  ren := SDL_CreateRenderer(win, nil, Ord(SDL_RENDERER_ACCELERATED) or Ord(SDL_RENDERER_TARGETTEXTURE));
-  SDL_SetRenderLogicalSize(ren, WINDOW_WIDTH, WINDOW_HEIGHT);
+  ren := SDL_CreateRenderer(win, nil, Ord(SDL_RENDERER_ACCELERATED));
+  SDL_SetRenderLogicalPresentation(ren, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_LOGICAL_PRESENTATION_LETTERBOX, SDL_SCALEMODE_BEST);
 
   // game loop
   quit := False;
