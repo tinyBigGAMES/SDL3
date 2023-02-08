@@ -28,7 +28,7 @@ Pascal bindings that allow you to use **SDL3** and other useful libraries with <
 **NOTE: Made/tested on latest Windows/Delphi/FreePascal.**
 
 ### Usage
-- You simply add `SDL3` to your uses section and everything will be linked in your executable **(~4MB overhead)**, ready for use with no DLLs to maintain. You will have direct access to all the aforementioned libraries. :cool:  
+- You simply add `SDL3` to your uses section and everything will be linked in your executable **(~2MB overhead)**, ready for use with no DLLs to maintain. You will have direct access to all the aforementioned libraries. :cool:  
 - Load the `SDL3 For Pascal.groupproj` group file in `installdir\sources\` folder into **Delphi** to compile/run examples.
 - See the `contrib` folder for community contributions.
 
