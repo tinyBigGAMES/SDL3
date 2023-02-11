@@ -16,6 +16,7 @@ Pascal bindings that allow you to use **SDL3** and other useful libraries with <
 - **Parson** (https://github.com/kgabis/parson)
 - **physfs** (https://github.com/icculus/physfs)
 - **pl_mpeg** (https://github.com/phoboslab/pl_mpeg)
+- **pocketlang** (https://github.com/ThakeeNathees/pocketlang)
 - **stb** (https://github.com/nothings/stb)
 - **tmx** (https://github.com/baylej/tmx)
 - **zlib** (https://github.com/madler/zlib)

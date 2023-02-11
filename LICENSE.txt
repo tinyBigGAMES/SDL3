@@ -65,14 +65,15 @@ POSSIBILITY OF SUCH DAMAGE.
 
 Includes the following open-sources libraries:
 -----------------------------------------------------------------------------
-* SDL3      - https://github.com/libsdl-org/SDL
-* miniaudio - https://github.com/mackron/miniaudio
-* nbnet     - https://github.com/nathhB/nbnet
-* Nuklear   - https://github.com/Immediate-Mode-UI/Nuklear
-* Parson    - https://github.com/kgabis/parson
-* physfs    - https://github.com/icculus/physfs
-* pl_mpeg   - https://github.com/phoboslab/pl_mpeg
-* stb       - https://github.com/nothings/stb 
-* tmx       - https://github.com/baylej/tmx
-* zlib      - https://github.com/madler/zlib
+* SDL3       - https://github.com/libsdl-org/SDL
+* miniaudio  - https://github.com/mackron/miniaudio
+* nbnet      - https://github.com/nathhB/nbnet
+* Nuklear    - https://github.com/Immediate-Mode-UI/Nuklear
+* Parson     - https://github.com/kgabis/parson
+* physfs     - https://github.com/icculus/physfs
+* pl_mpeg    - https://github.com/phoboslab/pl_mpeg
+* pocketlang - https://github.com/ThakeeNathees/pocketlang
+* stb        - https://github.com/nothings/stb 
+* tmx        - https://github.com/baylej/tmx
+* zlib       - https://github.com/madler/zlib
 
